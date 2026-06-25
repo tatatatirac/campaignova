@@ -121,7 +121,13 @@ export default async function DashboardPage() {
     regenerationsRemaining: PLAN_LIMITS.starter.regenerations
   };
 
-  if (hasSupabaseConfig()) {
+  const hasAuthConfig = hasSupabaseConfig();
+
+  if (!hasAuthConfig && process.env.NODE_ENV === "production") {
+    redirect("/login?error=Service%20configuration%20is%20incomplete.");
+  }
+
+  if (hasAuthConfig) {
     const supabase = await createClient();
     const { data } = await supabase.auth.getClaims();
     const ownerId = data?.claims?.sub;

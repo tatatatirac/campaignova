@@ -16,8 +16,13 @@ export default async function OnboardingPage({
   searchParams
 }: OnboardingPageProps) {
   const params = await searchParams;
+  const hasAuthConfig = hasSupabaseConfig();
 
-  if (hasSupabaseConfig()) {
+  if (!hasAuthConfig && process.env.NODE_ENV === "production") {
+    redirect("/login?error=Service%20configuration%20is%20incomplete.");
+  }
+
+  if (hasAuthConfig) {
     const supabase = await createClient();
     const { data } = await supabase.auth.getClaims();
 
